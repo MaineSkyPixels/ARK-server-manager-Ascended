@@ -1,0 +1,166 @@
+// Prisma Schema for ARK ASA Server Manager
+// This is the single source of truth for database structure
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// Core Entities
+// ============================================================================
+
+model Cluster {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  hosts Host[]
+
+  @@map("clusters")
+}
+
+model Host {
+  id        String   @id @default(uuid())
+  clusterId String?
+  hostname  String   @unique
+  ipAddress String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cluster  Cluster?  @relation(fields: [clusterId], references: [id])
+  agents   Agent[]
+  instances Instance[]
+
+  @@map("hosts")
+}
+
+model Agent {
+  id          String   @id @default(uuid())
+  hostId      String
+  agentId     String   @unique // External agent identifier
+  status      String   @default("OFFLINE") // AgentStatus enum
+  version     String?
+  lastSeenAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  host      Host       @relation(fields: [hostId], references: [id])
+  jobs      Job[]
+  instances Instance[]
+
+  @@map("agents")
+}
+
+model Instance {
+  id        String   @id @default(uuid())
+  instanceId String  @unique // External instance identifier
+  name      String
+  gameType  String   // GameType enum: 'ASA' | 'ASE'
+  status    String   @default("STOPPED") // InstanceStatus enum
+  agentId   String?
+  hostId    String?
+  config    Json?    // Instance-specific configuration
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent? @relation(fields: [agentId], references: [id])
+  host  Host? @relation(fields: [hostId], references: [id])
+  jobs  Job[]
+  backups Backup[]
+
+  @@map("instances")
+}
+
+model Job {
+  id          String   @id @default(uuid())
+  jobId       String   @unique // External job identifier
+  jobType     String   // JobType enum
+  status      String   @default("CREATED") // JobStatus enum
+  instanceId  String?
+  agentId     String?
+  parameters  Json     // Job-specific parameters
+  priority    Int      @default(0)
+  retryCount  Int      @default(0)
+  error       String?
+  createdAt   DateTime @default(now())
+  startedAt  DateTime?
+  completedAt DateTime?
+
+  agent    Agent?    @relation(fields: [agentId], references: [id])
+  instance Instance? @relation(fields: [instanceId], references: [id])
+  runs     JobRun[]
+
+  @@map("jobs")
+}
+
+model JobRun {
+  id          String   @id @default(uuid())
+  jobId       String
+  jobRunId    String   @unique // External job run identifier
+  status      String   @default("CREATED") // JobStatus enum
+  percent     Int?     // 0-100
+  message     String?
+  result      Json?
+  error       String?
+  errorDetails String?
+  createdAt   DateTime @default(now())
+  startedAt  DateTime?
+  completedAt DateTime?
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@map("job_runs")
+}
+
+model Backup {
+  id            String   @id @default(uuid())
+  instanceId    String
+  backupId      String   @unique // External backup identifier
+  timestamp     DateTime
+  gameType      String   // GameType enum
+  serverBuildId String?
+  manifest      Json     // Backup manifest
+  verified      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  instance Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@map("backups")
+}
+
+// ============================================================================
+// Settings Registry
+// ============================================================================
+
+model SettingRegistry {
+  id                String   @id @default(uuid())
+  gameType          String   // 'ASA' | 'ASE'
+  fileType          String   // 'Game.ini', 'GameUserSettings.ini', 'Cmdline', etc.
+  section           String   // Section name (empty string for top-level)
+  key               String   // Key name
+  valueType         String   // 'string', 'int', 'float', 'bool', 'array', etc.
+  defaultValue      String?  // Default value as string
+  constraints       Json?    // Validation constraints (min, max, enum values, etc.)
+  category          String?  // UI category for grouping
+  advanced          Boolean  @default(false) // Whether this is an advanced setting
+  controlType       String?  // UI control type ('text', 'number', 'checkbox', 'select', etc.)
+  introducedVersion String?  // Version when this setting was introduced
+  deprecatedVersion String? // Version when this setting was deprecated
+  description       String?  // Human-readable description
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([gameType, fileType, section, key])
+  @@index([gameType, fileType])
+  @@index([section, key])
+  @@map("setting_registry")
+}
+

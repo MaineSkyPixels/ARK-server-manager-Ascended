@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ArkAsaDesktopUi.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+             x:Class="ArkAsaDesktopUi.Views.InstancesListPage"
+             x:DataType="vm:InstancesListViewModel">
+    
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+            <TextBlock Text="Server Instances" FontSize="24" FontWeight="Bold" VerticalAlignment="Center"/>
+            <Button Content="Refresh" Command="{Binding LoadInstancesCommand}" Margin="16,0,0,0"/>
+        </StackPanel>
+
+        <!-- Error Message -->
+        <Border Grid.Row="1" 
+                Background="#FFE8E8E8"
+                BorderBrush="#FFFF0000"
+                BorderThickness="1"
+                Padding="12"
+                CornerRadius="4"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Margin="0,0,0,8">
+            <TextBlock Text="{Binding ErrorMessage}" 
+                      Foreground="#FFCC0000"
+                      TextWrapping="Wrap"/>
+        </Border>
+
+        <!-- Loading Indicator -->
+        <ProgressBar Grid.Row="1" 
+                     IsIndeterminate="True"
+                     IsVisible="{Binding IsLoading}"
+                     Height="4"
+                     Margin="0,0,0,8"/>
+
+        <!-- Instances List -->
+        <DataGrid Grid.Row="1"
+                 ItemsSource="{Binding Instances}"
+                 SelectedItem="{Binding SelectedInstance}"
+                 AutoGenerateColumns="False"
+                 IsReadOnly="True"
+                 GridLinesVisibility="Horizontal"
+                 HeadersVisibility="Column"
+                 IsVisible="{Binding !IsLoading}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="200"/>
+                <DataGridTextColumn Header="Game Type" Binding="{Binding GameType}" Width="100"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
+                <DataGridTextColumn Header="Agent ID" Binding="{Binding AgentId}" Width="*"/>
+                <DataGridTextColumn Header="Created" Binding="{Binding CreatedAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Width="150"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Empty State -->
+        <TextBlock Grid.Row="1"
+                  Text="No instances found. Click Refresh to load instances."
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                  IsVisible="{Binding Instances.Count, Converter={x:Static IntConverters.IsZero}}"/>
+    </Grid>
+</UserControl>
+

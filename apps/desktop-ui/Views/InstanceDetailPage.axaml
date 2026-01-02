@@ -1,0 +1,137 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ArkAsaDesktopUi.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+             x:Class="ArkAsaDesktopUi.Views.InstanceDetailPage"
+             x:DataType="vm:InstanceDetailViewModel">
+    
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+            <Button Content="← Back" Command="{Binding GoBackCommand}" Margin="0,0,16,0"/>
+            <TextBlock Text="{Binding Instance.Name, TargetNullValue='Loading...'}" 
+                      FontSize="24" 
+                      FontWeight="Bold" 
+                      VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding Instance.Status}" 
+                      Margin="16,0,0,0"
+                      VerticalAlignment="Center"
+                      Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        </StackPanel>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,16">
+            <Button Content="Start" Command="{Binding StartInstanceCommand}" Margin="0,0,8,0"/>
+            <Button Content="Stop" Command="{Binding StopInstanceCommand}" Margin="0,0,8,0"/>
+            <Button Content="Restart" Command="{Binding RestartInstanceCommand}" Margin="0,0,8,0"/>
+            <Button Content="Refresh" Command="{Binding LoadInstanceCommand}" Margin="0,0,8,0"/>
+        </StackPanel>
+
+        <!-- Error Message -->
+        <Border Grid.Row="2" 
+                Background="#FFE8E8E8"
+                BorderBrush="#FFFF0000"
+                BorderThickness="1"
+                Padding="12"
+                CornerRadius="4"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Margin="0,0,0,8">
+            <TextBlock Text="{Binding ErrorMessage}" 
+                      Foreground="#FFCC0000"
+                      TextWrapping="Wrap"/>
+        </Border>
+
+        <!-- Loading Indicator -->
+        <ProgressBar Grid.Row="2" 
+                     IsIndeterminate="True"
+                     IsVisible="{Binding IsLoading}"
+                     Height="4"
+                     Margin="0,0,0,8"/>
+
+        <!-- Tabs -->
+        <TabControl Grid.Row="2" SelectedIndex="{Binding SelectedTabIndex}" IsVisible="{Binding !IsLoading}">
+            <!-- Overview Tab -->
+            <TabItem Header="Overview">
+                <ScrollViewer>
+                    <StackPanel Margin="16" Spacing="12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Instance ID:" FontWeight="Bold"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Instance.InstanceId}"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Name:" FontWeight="Bold"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Instance.Name}"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Game Type:" FontWeight="Bold"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Instance.GameType}"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Status:" FontWeight="Bold"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Instance.Status}"/>
+
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Agent ID:" FontWeight="Bold"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Instance.AgentId}"/>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Logs Tab -->
+            <TabItem Header="Logs">
+                <DataGrid ItemsSource="{Binding Logs}"
+                         AutoGenerateColumns="False"
+                         IsReadOnly="True"
+                         GridLinesVisibility="Horizontal"
+                         HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Timestamp" Binding="{Binding Timestamp, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" Width="150"/>
+                        <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="80"/>
+                        <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+
+            <!-- Jobs Tab -->
+            <TabItem Header="Jobs">
+                <DataGrid ItemsSource="{Binding Jobs}"
+                         AutoGenerateColumns="False"
+                         IsReadOnly="True"
+                         GridLinesVisibility="Horizontal"
+                         HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Job Type" Binding="{Binding JobType}" Width="120"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+                        <DataGridTextColumn Header="Progress" Width="100">
+                            <DataGridTextColumn.Binding>
+                                <Binding Path="ProgressPercent" StringFormat="{}{0}%"/>
+                            </DataGridTextColumn.Binding>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Message" Binding="{Binding ProgressMessage}" Width="180"/>
+                        <DataGridTextColumn Header="Created" Binding="{Binding CreatedAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Width="130"/>
+                        <DataGridTextColumn Header="Completed" Binding="{Binding CompletedAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Width="130"/>
+                        <DataGridTextColumn Header="Error" Binding="{Binding Error}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>
+
