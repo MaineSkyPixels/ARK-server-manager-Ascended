@@ -85,7 +85,7 @@ export class AgentsService {
     return {
       agentId: agent.agentId,
       status: agent.status as AgentStatus,
-      assignedJobs: assignedJobs.map((j) => j.jobId),
+      assignedJobs: assignedJobs.map((j: { jobId: string }) => j.jobId),
       config,
     };
   }
@@ -117,15 +117,9 @@ export class AgentsService {
     // Update job statuses based on activeJobIds
     // If a job is RUNNING but not in activeJobIds, it might have completed
     // (This is simplified - full implementation would handle job completion separately)
-    const runningJobs = await this.prisma.job.findMany({
-      where: {
-        agentId: agent.id,
-        status: 'RUNNING',
-      },
-    });
-
     // Note: Full job completion handling will be in JobsService
     // This is just updating the agent's last seen time
+    // Future: const runningJobs = await this.prisma.job.findMany({ ... });
   }
 }
 

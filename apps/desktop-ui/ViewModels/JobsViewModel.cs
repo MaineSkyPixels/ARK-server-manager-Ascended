@@ -24,6 +24,8 @@ public partial class JobsViewModel : ViewModelBase
 
         // Subscribe to job progress updates
         _webSocketClient.JobProgressReceived += OnJobProgressReceived;
+        _webSocketClient.JobCompletedReceived += OnJobCompletedReceived;
+        _webSocketClient.JobFailedReceived += OnJobFailedReceived;
         
         // Load jobs on initialization
         _ = LoadJobsAsync();
@@ -92,6 +94,58 @@ public partial class JobsViewModel : ViewModelBase
                 RetryCount = job.RetryCount,
                 ProgressPercent = e.Percent,
                 ProgressMessage = e.Message
+            };
+        }
+    }
+
+    private void OnJobCompletedReceived(object? sender, JobCompletedDto e)
+    {
+        var job = Jobs.FirstOrDefault(j => j.JobId == e.JobId);
+        if (job != null)
+        {
+            var index = Jobs.IndexOf(job);
+            Jobs[index] = new JobResponseDto
+            {
+                JobId = job.JobId,
+                JobRunId = e.JobRunId,
+                JobType = job.JobType,
+                Status = JobStatus.COMPLETED,
+                InstanceId = job.InstanceId,
+                AgentId = job.AgentId,
+                Parameters = job.Parameters,
+                CreatedAt = job.CreatedAt,
+                StartedAt = job.StartedAt,
+                CompletedAt = e.CompletedAt,
+                Error = null,
+                RetryCount = job.RetryCount,
+                ProgressPercent = 100,
+                ProgressMessage = "Completed"
+            };
+        }
+    }
+
+    private void OnJobFailedReceived(object? sender, JobFailedDto e)
+    {
+        var job = Jobs.FirstOrDefault(j => j.JobId == e.JobId);
+        if (job != null)
+        {
+            var index = Jobs.IndexOf(job);
+            Jobs[index] = new JobResponseDto
+            {
+                JobId = job.JobId,
+                JobRunId = e.JobRunId,
+                JobType = job.JobType,
+                Status = JobStatus.FAILED,
+                InstanceId = job.InstanceId,
+                AgentId = job.AgentId,
+                Parameters = job.Parameters,
+                CreatedAt = job.CreatedAt,
+                StartedAt = job.StartedAt,
+                CompletedAt = e.FailedAt,
+                Error = e.Error,
+                RetryCount = job.RetryCount,
+                ProgressPercent = job.ProgressPercent,
+                ProgressMessage = $"Failed: {e.Error}"
             };
         }
     }

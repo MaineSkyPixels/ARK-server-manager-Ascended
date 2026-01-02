@@ -3,6 +3,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './common/filters/http-exception.filter';
+import { AppConfigService } from './config/config.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -15,6 +17,9 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   });
+
+  // Global exception filter
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   // Global validation pipe
   app.useGlobalPipes(
@@ -43,7 +48,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  const port = process.env.PORT || 3000;
+  const configService = app.get(AppConfigService);
+  const port = configService.port;
   await app.listen(port, '0.0.0.0');
   console.log(`Control Plane API is running on: http://localhost:${port}`);
   console.log(`Swagger documentation: http://localhost:${port}/api`);

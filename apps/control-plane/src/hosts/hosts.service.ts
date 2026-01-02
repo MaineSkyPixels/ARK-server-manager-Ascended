@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+// import { PrismaService } from '../prisma/prisma.service'; // Will be used when methods are implemented
 import { HostDto, HostCreateDto } from '@ark-asa/contracts';
 
 @Injectable()
 export class HostsService {
   private readonly logger = new Logger(HostsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  // constructor(private readonly prisma: PrismaService) {}
 
   // Placeholder for future implementation
   async createHost(dto: HostCreateDto): Promise<HostDto> {

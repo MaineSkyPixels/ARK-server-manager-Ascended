@@ -10,10 +10,15 @@ import { Server, WebSocket } from 'ws';
 import {
   WSEvent,
   WSEventName,
+  WSJobCreatedEvent,
   WSJobProgressEvent,
   WSJobCompletedEvent,
   WSJobFailedEvent,
   WSJobCancelledEvent,
+  WSInstanceCreatedEvent,
+  WSInstanceUpdatedEvent,
+  WSInstanceDeletedEvent,
+  WSInstanceStatusChangedEvent,
   WSInstanceLogEvent,
 } from '@ark-asa/contracts';
 
@@ -30,7 +35,7 @@ export class WebsocketGateway
   private readonly logger = new Logger(WebsocketGateway.name);
   private clients: Set<WebSocket> = new Set();
 
-  afterInit(server: Server) {
+  afterInit(_server: Server) {
     this.logger.log('WebSocket gateway initialized');
   }
 
@@ -101,6 +106,61 @@ export class WebsocketGateway
   emitJobCancelled(data: WSJobCancelledEvent['data']) {
     const event: WSJobCancelledEvent = {
       event: WSEventName.JOB_CANCELLED,
+      data,
+    };
+    this.broadcast(event);
+  }
+
+  /**
+   * Emit job created event
+   */
+  emitJobCreated(data: WSJobCreatedEvent['data']) {
+    const event: WSJobCreatedEvent = {
+      event: WSEventName.JOB_CREATED,
+      data,
+    };
+    this.broadcast(event);
+  }
+
+  /**
+   * Emit instance created event
+   */
+  emitInstanceCreated(data: WSInstanceCreatedEvent['data']) {
+    const event: WSInstanceCreatedEvent = {
+      event: WSEventName.INSTANCE_CREATED,
+      data,
+    };
+    this.broadcast(event);
+  }
+
+  /**
+   * Emit instance updated event
+   */
+  emitInstanceUpdated(data: WSInstanceUpdatedEvent['data']) {
+    const event: WSInstanceUpdatedEvent = {
+      event: WSEventName.INSTANCE_UPDATED,
+      data,
+    };
+    this.broadcast(event);
+  }
+
+  /**
+   * Emit instance deleted event
+   */
+  emitInstanceDeleted(data: WSInstanceDeletedEvent['data']) {
+    const event: WSInstanceDeletedEvent = {
+      event: WSEventName.INSTANCE_DELETED,
+      data,
+    };
+    this.broadcast(event);
+  }
+
+  /**
+   * Emit instance status changed event
+   */
+  emitInstanceStatusChanged(data: WSInstanceStatusChangedEvent['data']) {
+    const event: WSInstanceStatusChangedEvent = {
+      event: WSEventName.INSTANCE_STATUS_CHANGED,
       data,
     };
     this.broadcast(event);

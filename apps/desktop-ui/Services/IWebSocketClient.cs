@@ -10,6 +10,8 @@ public interface IWebSocketClient
     event EventHandler<bool> ConnectionStatusChanged;
     event EventHandler<WSEvent> EventReceived;
     event EventHandler<JobProgressDto> JobProgressReceived;
+    event EventHandler<JobCompletedDto> JobCompletedReceived;
+    event EventHandler<JobFailedDto> JobFailedReceived;
     event EventHandler<InstanceStatusChangedData> InstanceStatusChanged;
     event EventHandler<InstanceLogData> InstanceLogReceived;
 

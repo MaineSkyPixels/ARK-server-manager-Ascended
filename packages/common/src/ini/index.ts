@@ -8,4 +8,6 @@
 export * from './types';
 export * from './parser';
 export * from './renderer';
+export * from './registry-loader';
+export * from './registry-importer';
 

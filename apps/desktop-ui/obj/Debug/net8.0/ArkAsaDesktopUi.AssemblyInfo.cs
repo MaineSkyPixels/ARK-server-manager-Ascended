@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ArkAsaDesktopUi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3d9162214f5cf7a7f894959a518e2fa1b3fca034")]
 [assembly: System.Reflection.AssemblyProductAttribute("ArkAsaDesktopUi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ArkAsaDesktopUi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

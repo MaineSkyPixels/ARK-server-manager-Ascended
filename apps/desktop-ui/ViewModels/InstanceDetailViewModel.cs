@@ -6,7 +6,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using InstanceLogData = ArkAsaDesktopUi.Models.InstanceLogData;
 
 namespace ArkAsaDesktopUi.ViewModels;
 
@@ -32,6 +31,9 @@ public partial class InstanceDetailViewModel : ViewModelBase
         // Subscribe to instance status changes and logs
         _webSocketClient.InstanceStatusChanged += OnInstanceStatusChanged;
         _webSocketClient.InstanceLogReceived += OnInstanceLogReceived;
+        
+        // Subscribe to job events for this instance
+        SubscribeToJobEvents();
     }
 
     private string _instanceId = string.Empty;
@@ -68,7 +70,17 @@ public partial class InstanceDetailViewModel : ViewModelBase
     public int SelectedTabIndex
     {
         get => _selectedTabIndex;
-        set => SetProperty(ref _selectedTabIndex, value);
+        set
+        {
+            if (SetProperty(ref _selectedTabIndex, value))
+            {
+                // Load logs when Logs tab (index 1) is selected
+                if (value == 1 && !string.IsNullOrEmpty(InstanceId) && Logs.Count == 0)
+                {
+                    _ = LoadLogsAsync();
+                }
+            }
+        }
     }
 
     public ObservableCollection<LogEntry> Logs => _logs;
@@ -100,7 +112,10 @@ public partial class InstanceDetailViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public async Task LoadInstanceCommandAsync() => await LoadInstanceAsync();
+    private async Task RefreshInstanceAsync()
+    {
+        await LoadInstanceAsync();
+    }
 
     [RelayCommand]
     public async Task LoadJobsAsync()
@@ -249,6 +264,101 @@ public partial class InstanceDetailViewModel : ViewModelBase
                 {
                     Logs.RemoveAt(0);
                 }
+            }
+        }
+    }
+
+    // Subscribe to job events for this instance
+    private void SubscribeToJobEvents()
+    {
+        _webSocketClient.JobProgressReceived += OnJobProgressReceived;
+        _webSocketClient.JobCompletedReceived += OnJobCompletedReceived;
+        _webSocketClient.JobFailedReceived += OnJobFailedReceived;
+    }
+
+    private void OnJobProgressReceived(object? sender, JobProgressDto e)
+    {
+        if (Instance != null && e.JobId != null)
+        {
+            var job = Jobs.FirstOrDefault(j => j.JobId == e.JobId);
+            if (job != null)
+            {
+                var index = Jobs.IndexOf(job);
+                Jobs[index] = new JobResponseDto
+                {
+                    JobId = job.JobId,
+                    JobRunId = e.JobRunId,
+                    JobType = job.JobType,
+                    Status = e.Status,
+                    InstanceId = job.InstanceId,
+                    AgentId = job.AgentId,
+                    Parameters = job.Parameters,
+                    CreatedAt = job.CreatedAt,
+                    StartedAt = job.StartedAt,
+                    CompletedAt = job.CompletedAt,
+                    Error = job.Error,
+                    RetryCount = job.RetryCount,
+                    ProgressPercent = e.Percent,
+                    ProgressMessage = e.Message
+                };
+            }
+        }
+    }
+
+    private void OnJobCompletedReceived(object? sender, JobCompletedDto e)
+    {
+        if (Instance != null && e.JobId != null)
+        {
+            var job = Jobs.FirstOrDefault(j => j.JobId == e.JobId);
+            if (job != null)
+            {
+                var index = Jobs.IndexOf(job);
+                Jobs[index] = new JobResponseDto
+                {
+                    JobId = job.JobId,
+                    JobRunId = e.JobRunId,
+                    JobType = job.JobType,
+                    Status = JobStatus.COMPLETED,
+                    InstanceId = job.InstanceId,
+                    AgentId = job.AgentId,
+                    Parameters = job.Parameters,
+                    CreatedAt = job.CreatedAt,
+                    StartedAt = job.StartedAt,
+                    CompletedAt = e.CompletedAt,
+                    Error = null,
+                    RetryCount = job.RetryCount,
+                    ProgressPercent = 100,
+                    ProgressMessage = "Completed"
+                };
+            }
+        }
+    }
+
+    private void OnJobFailedReceived(object? sender, JobFailedDto e)
+    {
+        if (Instance != null && e.JobId != null)
+        {
+            var job = Jobs.FirstOrDefault(j => j.JobId == e.JobId);
+            if (job != null)
+            {
+                var index = Jobs.IndexOf(job);
+                Jobs[index] = new JobResponseDto
+                {
+                    JobId = job.JobId,
+                    JobRunId = e.JobRunId,
+                    JobType = job.JobType,
+                    Status = JobStatus.FAILED,
+                    InstanceId = job.InstanceId,
+                    AgentId = job.AgentId,
+                    Parameters = job.Parameters,
+                    CreatedAt = job.CreatedAt,
+                    StartedAt = job.StartedAt,
+                    CompletedAt = e.FailedAt,
+                    Error = e.Error,
+                    RetryCount = job.RetryCount,
+                    ProgressPercent = job.ProgressPercent,
+                    ProgressMessage = $"Failed: {e.Error}"
+                };
             }
         }
     }

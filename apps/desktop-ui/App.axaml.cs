@@ -6,6 +6,7 @@ using ArkAsaDesktopUi.ViewModels;
 using ArkAsaDesktopUi.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 
 namespace ArkAsaDesktopUi;
 
@@ -41,9 +42,30 @@ public partial class App : Application
 
     private void ConfigureServices(IServiceCollection services)
     {
+        // Load configuration
+        var config = AppConfiguration.Load();
+        services.AddSingleton(config);
+
         // Services
-        services.AddSingleton<IApiClient, ApiClient>();
-        services.AddSingleton<IWebSocketClient, WebSocketClient>();
+        services.AddSingleton<IApiClient>(sp => new ApiClient(sp.GetRequiredService<AppConfiguration>()));
+        services.AddSingleton<IWebSocketClient>(sp =>
+        {
+            var wsClient = new WebSocketClient();
+            // Initialize WebSocket connection with configured URL (async, don't block startup)
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await wsClient.ConnectAsync(config.WebSocketUrl);
+                }
+                catch (Exception)
+                {
+                    // Connection failed - will show disconnected status
+                    // Reconnection can be handled by the client if needed
+                }
+            });
+            return wsClient;
+        });
         
         // ViewModels - must be registered before NavigationService
         services.AddTransient<MainWindowViewModel>();

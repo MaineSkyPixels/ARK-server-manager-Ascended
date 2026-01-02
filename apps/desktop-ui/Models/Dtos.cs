@@ -154,6 +154,36 @@ public class JobProgressDto
     public DateTime Timestamp { get; set; }
 }
 
+public class JobCompletedDto
+{
+    [JsonPropertyName("jobId")]
+    public string JobId { get; set; } = string.Empty;
+
+    [JsonPropertyName("jobRunId")]
+    public string JobRunId { get; set; } = string.Empty;
+
+    [JsonPropertyName("completedAt")]
+    public DateTime CompletedAt { get; set; }
+
+    [JsonPropertyName("result")]
+    public Dictionary<string, object>? Result { get; set; }
+}
+
+public class JobFailedDto
+{
+    [JsonPropertyName("jobId")]
+    public string JobId { get; set; } = string.Empty;
+
+    [JsonPropertyName("jobRunId")]
+    public string JobRunId { get; set; } = string.Empty;
+
+    [JsonPropertyName("error")]
+    public string Error { get; set; } = string.Empty;
+
+    [JsonPropertyName("failedAt")]
+    public DateTime FailedAt { get; set; }
+}
+
 #endregion
 
 #region WebSocket Event DTOs
@@ -174,6 +204,24 @@ public class WSJobProgressEvent
 
     [JsonPropertyName("data")]
     public JobProgressDto Data { get; set; } = new();
+}
+
+public class WSJobCompletedEvent
+{
+    [JsonPropertyName("event")]
+    public string Event { get; set; } = "job:completed";
+
+    [JsonPropertyName("data")]
+    public JobCompletedDto Data { get; set; } = new();
+}
+
+public class WSJobFailedEvent
+{
+    [JsonPropertyName("event")]
+    public string Event { get; set; } = "job:failed";
+
+    [JsonPropertyName("data")]
+    public JobFailedDto Data { get; set; } = new();
 }
 
 public class WSInstanceStatusChangedEvent
@@ -222,4 +270,3 @@ public class InstanceLogData
 }
 
 #endregion
-

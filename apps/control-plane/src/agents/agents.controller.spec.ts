@@ -6,8 +6,6 @@ import { AgentStatus } from '@ark-asa/contracts';
 
 describe('AgentsController', () => {
   let controller: AgentsController;
-  let service: AgentsService;
-  let prisma: PrismaService;
 
   const mockPrismaService = {
     host: {
@@ -37,8 +35,6 @@ describe('AgentsController', () => {
     }).compile();
 
     controller = module.get<AgentsController>(AgentsController);
-    service = module.get<AgentsService>(AgentsService);
-    prisma = module.get<PrismaService>(PrismaService);
   });
 
   afterEach(() => {

@@ -41,7 +41,7 @@ This document tracks the status of change requests relevant to Agent B (Windows 
 
 ## CR-002: Instance Logs Endpoint
 
-**Status:** ✅ **APPROVED** | ✅ **CONTRACTS COMPLETE** | ⏳ **PENDING IMPLEMENTATION**
+**Status:** ✅ **APPROVED** | ✅ **CONTRACTS COMPLETE** | ✅ **IMPLEMENTED**
 
 **Requested by:** Agent D (not Agent B)
 
@@ -50,7 +50,9 @@ This document tracks the status of change requests relevant to Agent B (Windows 
   - `LogEntryDto` added to `packages/contracts/src/dto/instance.dto.ts`
   - `INSTANCE_LOG` event added to `packages/contracts/src/ws-events.ts`
   - `WSInstanceLogEvent` interface defined
-- ⏳ Endpoint not yet implemented
+- ✅ Endpoint implemented:
+  - `GET /instances/{instanceId}/logs` - Returns log entries with filtering
+  - WebSocket event emission method added
 
 **Impact on Agent B:**
 - 🟢 **NO IMPACT** - This is for UI, not agent runtime
@@ -75,7 +77,7 @@ This document tracks the status of change requests relevant to Agent B (Windows 
 
 ## CR-004: Job Progress Details in JobResponseDto
 
-**Status:** ✅ **APPROVED** | ✅ **CONTRACTS COMPLETE** | ⏳ **PENDING IMPLEMENTATION**
+**Status:** ✅ **APPROVED** | ✅ **CONTRACTS COMPLETE** | ✅ **IMPLEMENTED**
 
 **Requested by:** Agent D (not Agent B)
 
@@ -83,7 +85,9 @@ This document tracks the status of change requests relevant to Agent B (Windows 
 - ✅ Contract updates complete:
   - `progressPercent?: number` added to `JobResponseDto`
   - `progressMessage?: string` added to `JobResponseDto`
-- ⏳ Control plane must populate these fields when returning job details
+- ✅ Control plane populates these fields:
+  - `GET /jobs/{jobId}` endpoint implemented
+  - Progress fields populated from latest `JobRun` record
 
 **Impact on Agent B:**
 - 🟢 **NO IMPACT** - Agent reports progress via `JobProgressDto`, not `JobResponseDto`
@@ -104,6 +108,9 @@ This document tracks the status of change requests relevant to Agent B (Windows 
 ### Non-Blockers (Can Proceed)
 
 - CR-002, CR-003, CR-004 are not blocking Agent B functionality
+- ✅ CR-002: Instance logs endpoint - Complete (for UI)
+- ✅ CR-003: WebSocket gateway - Complete (for UI)
+- ✅ CR-004: Job progress fields - Complete (for UI)
 
 ---
 

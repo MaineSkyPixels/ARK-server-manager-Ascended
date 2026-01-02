@@ -13,10 +13,11 @@ public class ApiClient : IApiClient
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
 
-    public string BaseUrl { get; set; } = "http://localhost:3000/api";
+    public string BaseUrl { get; set; }
 
-    public ApiClient()
+    public ApiClient(AppConfiguration? config = null)
     {
+        BaseUrl = config?.ApiBaseUrl ?? "http://localhost:3000/api";
         _httpClient = new HttpClient();
         _jsonOptions = new JsonSerializerOptions
         {

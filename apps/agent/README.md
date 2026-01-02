@@ -122,7 +122,9 @@ runtime/
 - ✅ Job polling and assignment
 - ✅ Progress reporting infrastructure
 - ✅ Completion reporting infrastructure
-- ⏳ Actual job execution logic (placeholder only)
+- ✅ Process control jobs (START_INSTANCE, STOP_INSTANCE, RESTART_INSTANCE)
+- ✅ SteamCMD jobs (INSTALL_SERVER, UPDATE_SERVER, ACTIVATE_BUILD)
+- ⏳ Backup and mod jobs (placeholder - will throw "not implemented" error)
 
 ## Assumptions About Endpoints
 

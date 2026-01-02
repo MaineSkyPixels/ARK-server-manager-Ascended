@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Settings Registry Seed Data Format",
+  "description": "JSON schema for importing ASA/ASE settings registry entries",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Seed data format version",
+      "default": "1.0.0"
+    },
+    "entries": {
+      "type": "array",
+      "description": "Array of registry entries",
+      "items": {
+        "$ref": "#/definitions/RegistryEntry"
+      }
+    }
+  },
+  "required": ["version", "entries"],
+  "definitions": {
+    "RegistryEntry": {
+      "type": "object",
+      "description": "A single registry entry",
+      "properties": {
+        "gameType": {
+          "type": "string",
+          "enum": ["ASA", "ASE"],
+          "description": "Game type"
+        },
+        "fileType": {
+          "type": "string",
+          "description": "File type (e.g., 'Game.ini', 'GameUserSettings.ini', 'Cmdline')"
+        },
+        "section": {
+          "type": "string",
+          "description": "Section name (empty string for top-level)"
+        },
+        "key": {
+          "type": "string",
+          "description": "Key name"
+        },
+        "valueType": {
+          "type": "string",
+          "enum": ["string", "int", "float", "bool", "array", "enum"],
+          "description": "Value type"
+        },
+        "defaultValue": {
+          "type": ["string", "null"],
+          "description": "Default value as string (null if no default)"
+        },
+        "constraints": {
+          "type": ["object", "null"],
+          "description": "Validation constraints",
+          "properties": {
+            "min": {
+              "type": ["number", "null"],
+              "description": "Minimum value (for int/float)"
+            },
+            "max": {
+              "type": ["number", "null"],
+              "description": "Maximum value (for int/float)"
+            },
+            "enum": {
+              "type": ["array", "null"],
+              "items": {
+                "type": "string"
+              },
+              "description": "Allowed values (for enum type)"
+            },
+            "pattern": {
+              "type": ["string", "null"],
+              "description": "Regex pattern (for string validation)"
+            },
+            "required": {
+              "type": ["boolean", "null"],
+              "description": "Whether this setting is required"
+            }
+          }
+        },
+        "category": {
+          "type": ["string", "null"],
+          "description": "UI category for grouping"
+        },
+        "advanced": {
+          "type": "boolean",
+          "description": "Whether this is an advanced setting",
+          "default": false
+        },
+        "controlType": {
+          "type": ["string", "null"],
+          "enum": ["text", "number", "checkbox", "select", "textarea", "multiselect", null],
+          "description": "UI control type"
+        },
+        "introducedVersion": {
+          "type": ["string", "null"],
+          "description": "Version when this setting was introduced"
+        },
+        "deprecatedVersion": {
+          "type": ["string", "null"],
+          "description": "Version when this setting was deprecated"
+        },
+        "description": {
+          "type": ["string", "null"],
+          "description": "Human-readable description"
+        }
+      },
+      "required": ["gameType", "fileType", "section", "key", "valueType"]
+    }
+  }
+}
+

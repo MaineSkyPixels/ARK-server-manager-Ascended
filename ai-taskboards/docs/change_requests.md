@@ -185,9 +185,12 @@ The instance detail page has a Logs tab, but there's no endpoint to fetch instan
 - ✅ `WSInstanceLogEvent` interface defined (lines 116-124)
 - ✅ Added to `WSEvent` union type (line 174)
 
-**Implementation Status:** ⏳ **PENDING** - Endpoint not yet implemented
-- `apps/control-plane/src/instances/instances.controller.ts` - Endpoint needed
-- WebSocket event emission needed when logs are available
+**Implementation Status:** ✅ **COMPLETE** - Endpoint implemented
+- ✅ `GET /instances/{instanceId}/logs` - Implemented in `apps/control-plane/src/instances/instances.controller.ts` (line 12-29)
+- ✅ Service method `getInstanceLogs()` implemented in `apps/control-plane/src/instances/instances.service.ts`
+- ✅ WebSocket event emission method `emitInstanceLog()` added to gateway
+- ✅ Query parameters validated (limit, since, level)
+- ✅ Instance validation working
 
 ---
 
@@ -321,9 +324,12 @@ The UI displays job progress, but the `JobResponseDto` doesn't include progress 
 - ✅ `progressPercent?: number` added to `JobResponseDto` in `packages/contracts/src/dto/job.dto.ts` (line 31)
 - ✅ `progressMessage?: string` added to `JobResponseDto` (line 32)
 
-**Implementation Status:** ⏳ **PENDING** - Control plane must populate these fields
-- Control plane should populate from latest `JobRun` record when returning job details
-- Fields should be `undefined` if no progress has been reported yet
+**Implementation Status:** ✅ **COMPLETE** - Progress fields populated in responses
+- ✅ `GET /jobs/{jobId}` endpoint implemented in `apps/control-plane/src/jobs/jobs.controller.ts` (line 58-70)
+- ✅ `getJobById()` method in `apps/control-plane/src/jobs/jobs.service.ts` populates progress fields
+- ✅ `progressPercent` populated from latest `JobRun.percent`
+- ✅ `progressMessage` populated from latest `JobRun.message`
+- ✅ Fields are `undefined` if no progress reported yet
 
 **Implementation Priority:** MEDIUM (enhances UI functionality)
 
@@ -403,10 +409,11 @@ model SettingRegistry {
 
 **Implementation Priority:** MEDIUM (needed for Milestone 2, not blocking Milestone 1)
 
-**Implementation Status:** ✅ **COMPLETE** - Schema added to Prisma
+**Implementation Status:** ✅ **COMPLETE** - Schema added to Prisma (Migration Ready)
 - ✅ `SettingRegistry` model added to `packages/db/prisma/schema.prisma` (lines 143-165)
 - ✅ All fields match approved specification
 - ✅ Unique constraint `@@unique([gameType, fileType, section, key])` added
 - ✅ Indexes `@@index([gameType, fileType])` and `@@index([section, key])` added
 - ✅ Table mapping `@@map("setting_registry")` added
 - ⏳ **Migration pending** - Run `pnpm --filter @ark-asa/db prisma migrate dev --name add_setting_registry` when ready to create the database table
+- **Note:** Schema is complete and ready. Migration can be run when Agent C is ready for Milestone 2.

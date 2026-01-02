@@ -19,10 +19,14 @@
   - Database updates working
 
 ### CR-002: Instance Logs Endpoint
-- **Status:** ✅ Approved (Contracts Updated)
+- **Status:** ✅ Approved & ✅ Implemented
 - **Requested by:** Agent D
 - **Priority:** MEDIUM
-- **Implementation:** Pending — Endpoint needed
+- **Implementation:** ✅ **COMPLETE** — Endpoint implemented
+  - `GET /instances/{instanceId}/logs` - Returns log entries with filtering
+  - Query parameters: limit, since, level
+  - WebSocket event emission method added
+  - Instance validation working
 
 ### CR-003: WebSocket Connection Endpoint
 - **Status:** ✅ Approved & ✅ Implemented
@@ -35,16 +39,24 @@
   - Supports all required events
 
 ### CR-004: Job Progress Details in JobResponseDto
-- **Status:** ✅ Approved (Contracts Updated)
+- **Status:** ✅ Approved & ✅ Implemented
 - **Requested by:** Agent D
 - **Priority:** MEDIUM
-- **Implementation:** Pending — Needs verification that responses include progress fields
+- **Implementation:** ✅ **COMPLETE** — Progress fields populated
+  - `GET /jobs/{jobId}` endpoint implemented
+  - `progressPercent` populated from latest `JobRun.percent`
+  - `progressMessage` populated from latest `JobRun.message`
+  - Fields are `undefined` if no progress reported yet
 
 ### CR-005: Settings Registry Database Schema
-- **Status:** ✅ Approved
+- **Status:** ✅ Approved & ✅ Schema Complete
 - **Requested by:** Agent C
 - **Priority:** MEDIUM
-- **Implementation:** Ready for Milestone 2 — Schema approved, can be added when needed
+- **Implementation:** ✅ **SCHEMA COMPLETE** — Migration Ready
+  - `SettingRegistry` model added to Prisma schema
+  - All fields match approved specification
+  - Unique constraint and indexes added
+  - ⏳ Migration pending (can be run when Agent C ready for Milestone 2)
 
 ---
 
@@ -52,17 +64,19 @@
 
 | Status | Count | Change Requests |
 |--------|-------|----------------|
-| ✅ Fully Implemented | 2 | CR-001, CR-003 |
-| ✅ Contracts Complete, Implementation Pending | 2 | CR-002, CR-004 |
-| 📅 Approved, Ready for Future | 1 | CR-005 |
+| ✅ Fully Implemented | 4 | CR-001, CR-002, CR-003, CR-004 |
+| ✅ Schema Complete, Migration Pending | 1 | CR-005 |
 
 ---
 
 ## 🎯 Next Actions
 
-1. **CR-002**: Implement instance logs endpoint (Agent A)
-2. **CR-004**: Verify job responses include progress fields (Agent A)
-3. **CR-005**: Add SettingRegistry schema when Agent C ready for Milestone 2
+1. ✅ **CR-001**: Complete — All job endpoints working
+2. ✅ **CR-002**: Complete — Instance logs endpoint implemented
+3. ✅ **CR-003**: Complete — WebSocket gateway working
+4. ✅ **CR-004**: Complete — Progress fields populated in job responses
+5. **CR-005**: Run migration when Agent C ready for Milestone 2
+   - Command: `pnpm --filter @ark-asa/db prisma migrate dev --name add_setting_registry`
 
 ---
 

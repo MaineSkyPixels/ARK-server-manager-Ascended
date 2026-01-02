@@ -1,0 +1,151 @@
+{
+  "version": "1.0.0",
+  "entries": [
+    {
+      "gameType": "ASA",
+      "fileType": "Game.ini",
+      "section": "ServerSettings",
+      "key": "ServerName",
+      "valueType": "string",
+      "defaultValue": null,
+      "constraints": {
+        "required": true,
+        "pattern": "^.{1,200}$"
+      },
+      "category": "Server",
+      "advanced": false,
+      "controlType": "text",
+      "description": "The name of the server as it appears in the server browser",
+      "introducedVersion": "1.0.0",
+      "deprecatedVersion": null
+    },
+    {
+      "gameType": "ASA",
+      "fileType": "Game.ini",
+      "section": "ServerSettings",
+      "key": "ServerPassword",
+      "valueType": "string",
+      "defaultValue": null,
+      "constraints": {
+        "required": false,
+        "pattern": "^.{0,128}$"
+      },
+      "category": "Server",
+      "advanced": false,
+      "controlType": "text",
+      "description": "Password required to join the server (leave empty for no password)",
+      "introducedVersion": "1.0.0",
+      "deprecatedVersion": null
+    },
+    {
+      "gameType": "ASA",
+      "fileType": "Game.ini",
+      "section": "ServerSettings",
+      "key": "Port",
+      "valueType": "int",
+      "defaultValue": "7777",
+      "constraints": {
+        "min": 1024,
+        "max": 65535,
+        "required": true
+      },
+      "category": "Network",
+      "advanced": false,
+      "controlType": "number",
+      "description": "Port number for game traffic",
+      "introducedVersion": "1.0.0",
+      "deprecatedVersion": null
+    },
+    {
+      "gameType": "ASA",
+      "fileType": "Game.ini",
+      "section": "ServerSettings",
+      "key": "QueryPort",
+      "valueType": "int",
+      "defaultValue": "27015",
+      "constraints": {
+        "min": 1024,
+        "max": 65535,
+        "required": true
+      },
+      "category": "Network",
+      "advanced": false,
+      "controlType": "number",
+      "description": "Port number for server queries",
+      "introducedVersion": "1.0.0",
+      "deprecatedVersion": null
+    },
+    {
+      "gameType": "ASA",
+      "fileType": "Game.ini",
+      "section": "ServerSettings",
+      "key": "MaxNumberOfPlayers",
+      "valueType": "int",
+      "defaultValue": "70",
+      "constraints": {
+        "min": 1,
+        "max": 255,
+        "required": true
+      },
+      "category": "Server",
+      "advanced": false,
+      "controlType": "number",
+      "description": "Maximum number of players allowed on the server",
+      "introducedVersion": "1.0.0",
+      "deprecatedVersion": null
+    },
+    {
+      "gameType": "ASA",
+      "fileType": "Game.ini",
+      "section": "GameSettings",
+      "key": "DifficultyOffset",
+      "valueType": "float",
+      "defaultValue": "1.0",
+      "constraints": {
+        "min": 0.0,
+        "max": 10.0,
+        "required": true
+      },
+      "category": "Gameplay",
+      "advanced": false,
+      "controlType": "number",
+      "description": "Difficulty offset multiplier (0.0 to 10.0)",
+      "introducedVersion": "1.0.0",
+      "deprecatedVersion": null
+    },
+    {
+      "gameType": "ASA",
+      "fileType": "GameUserSettings.ini",
+      "section": "ServerSettings",
+      "key": "bUseServerSpawnLocation",
+      "valueType": "bool",
+      "defaultValue": "False",
+      "constraints": null,
+      "category": "Spawn",
+      "advanced": true,
+      "controlType": "checkbox",
+      "description": "Use server-defined spawn location",
+      "introducedVersion": "1.0.0",
+      "deprecatedVersion": null
+    },
+    {
+      "gameType": "ASA",
+      "fileType": "GameUserSettings.ini",
+      "section": "ServerSettings",
+      "key": "ServerAdminPassword",
+      "valueType": "string",
+      "defaultValue": null,
+      "constraints": {
+        "required": false,
+        "pattern": "^.{0,128}$"
+      },
+      "category": "Admin",
+      "advanced": true,
+      "controlType": "text",
+      "description": "Password for admin commands (cheat commands)",
+      "introducedVersion": "1.0.0",
+      "deprecatedVersion": null
+    }
+  ]
+}
+

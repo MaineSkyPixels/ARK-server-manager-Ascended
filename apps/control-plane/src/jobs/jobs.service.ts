@@ -11,6 +11,7 @@ import {
   JobStatus,
   JobType,
 } from '@ark-asa/contracts';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class JobsService {
@@ -21,11 +22,113 @@ export class JobsService {
     private readonly wsGateway: WebsocketGateway,
   ) {}
 
-  // Placeholder for future implementation
+  /**
+   * Create a new job
+   * Assigns job to an agent based on instance or round-robin
+   */
   async createJob(dto: JobCreateDto): Promise<JobResponseDto> {
-    this.logger.log(`Creating job: ${dto.jobType}`);
-    // Implementation will be added in future milestones
-    throw new Error('Not implemented');
+    this.logger.log(`Creating job: ${dto.jobType}${dto.instanceId ? ` for instance: ${dto.instanceId}` : ''}`);
+
+    // Validate instance exists if provided
+    let instance = null;
+    let agentId: string | null = null;
+
+    if (dto.instanceId) {
+      instance = await this.prisma.instance.findUnique({
+        where: { instanceId: dto.instanceId },
+        include: { agent: true },
+      });
+
+      if (!instance) {
+        throw new NotFoundException(`Instance not found: ${dto.instanceId}`);
+      }
+
+      // Assign to instance's agent if available
+      if (instance.agentId) {
+        const agent = await this.prisma.agent.findUnique({
+          where: { id: instance.agentId },
+        });
+        if (agent && agent.status === 'ONLINE') {
+          agentId = agent.id;
+        }
+      }
+    }
+
+    // If no agent assigned yet, find an available agent (round-robin or first available)
+    if (!agentId) {
+      const availableAgent = await this.prisma.agent.findFirst({
+        where: {
+          status: 'ONLINE',
+        },
+        orderBy: {
+          lastSeenAt: 'desc',
+        },
+      });
+
+      if (!availableAgent) {
+        throw new BadRequestException('No available agents to assign job');
+      }
+
+      agentId = availableAgent.id;
+    }
+
+    // Generate unique job ID and job run ID
+    const jobId = `job-${uuidv4()}`;
+    const jobRunId = `run-${uuidv4()}`;
+
+    // Create job
+    const job = await this.prisma.job.create({
+      data: {
+        jobId,
+        jobType: dto.jobType,
+        status: JobStatus.QUEUED,
+        instanceId: instance?.id || null,
+        agentId,
+        parameters: dto.parameters,
+        priority: dto.priority || 0,
+      },
+    });
+
+    // Create initial job run
+    await this.prisma.jobRun.create({
+      data: {
+        jobRunId,
+        jobId: job.id,
+        status: JobStatus.QUEUED,
+        percent: 0,
+        message: 'Job queued',
+      },
+    });
+
+    this.logger.log(`Created job: ${jobId} (run: ${jobRunId}) assigned to agent`);
+
+    // Build response
+    const response: JobResponseDto = {
+      jobId,
+      jobRunId,
+      jobType: job.jobType as JobType,
+      status: job.status as JobStatus,
+      instanceId: instance?.instanceId || undefined,
+      agentId: undefined, // Don't expose internal agent ID
+      parameters: job.parameters as Record<string, unknown>,
+      createdAt: job.createdAt.toISOString(),
+      startedAt: job.startedAt?.toISOString(),
+      completedAt: job.completedAt?.toISOString(),
+      error: job.error || undefined,
+      retryCount: job.retryCount,
+      progressPercent: 0,
+      progressMessage: 'Job queued',
+    };
+
+    // Emit WebSocket event for job creation
+    this.wsGateway.emitJobCreated({
+      jobId,
+      jobType: dto.jobType,
+      instanceId: dto.instanceId,
+      createdAt: job.createdAt.toISOString(),
+    });
+
+    return response;
   }
 
   /**
@@ -116,8 +219,8 @@ export class JobsService {
 
     // Convert to JobAssignmentDto format
     const assignments: JobAssignmentDto[] = jobs
-      .filter((job) => job.runs.length > 0)
-      .map((job) => {
+      .filter((job: any) => job.runs.length > 0)
+      .map((job: any) => {
         const latestRun = job.runs[0];
         return {
           jobId: job.jobId,

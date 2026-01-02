@@ -3,6 +3,7 @@
              xmlns:vm="using:ArkAsaDesktopUi.ViewModels"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:Avalonia.Controls"
              mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
              x:Class="ArkAsaDesktopUi.Views.InstanceDetailPage"
              x:DataType="vm:InstanceDetailViewModel">
@@ -32,7 +33,7 @@
             <Button Content="Start" Command="{Binding StartInstanceCommand}" Margin="0,0,8,0"/>
             <Button Content="Stop" Command="{Binding StopInstanceCommand}" Margin="0,0,8,0"/>
             <Button Content="Restart" Command="{Binding RestartInstanceCommand}" Margin="0,0,8,0"/>
-            <Button Content="Refresh" Command="{Binding LoadInstanceCommand}" Margin="0,0,8,0"/>
+            <Button Content="Refresh" Command="{Binding RefreshInstanceCommand}" Margin="0,0,8,0"/>
         </StackPanel>
 
         <!-- Error Message -->

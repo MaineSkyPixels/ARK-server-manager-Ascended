@@ -1,4 +1,4 @@
-import { IsString, IsObject, ValidateNested, IsArray, IsBoolean, IsNumber, IsOptional } from 'class-validator';
+import { IsString, ValidateNested, IsArray, IsBoolean, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { AgentRegistrationDto, AgentCapabilitiesDto } from '@ark-asa/contracts';
 

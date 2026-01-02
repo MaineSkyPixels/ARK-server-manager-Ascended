@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsArray, IsOptional, IsObject, ValidateNested } from 'class-validator';
+import { IsString, IsEnum, IsArray, IsOptional, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { AgentHeartbeatDto, AgentStatus, ResourceUsageDto } from '@ark-asa/contracts';
 

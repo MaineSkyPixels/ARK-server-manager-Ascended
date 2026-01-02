@@ -3,6 +3,7 @@
              xmlns:vm="using:ArkAsaDesktopUi.ViewModels"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:Avalonia.Controls"
              mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
              x:Class="ArkAsaDesktopUi.Views.JobsPage"
              x:DataType="vm:JobsViewModel">
@@ -71,7 +72,7 @@
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center"
                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                  IsVisible="{Binding Jobs.Count, Converter={x:Static IntConverters.IsZero}}"/>
+                  IsVisible="{Binding Jobs, Converter={x:Static ObjectConverters.IsNull}}"/>
     </Grid>
 </UserControl>
 

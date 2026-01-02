@@ -31,6 +31,8 @@ public class WebSocketClient : IWebSocketClient
     public event EventHandler<bool>? ConnectionStatusChanged;
     public event EventHandler<WSEvent>? EventReceived;
     public event EventHandler<JobProgressDto>? JobProgressReceived;
+    public event EventHandler<JobCompletedDto>? JobCompletedReceived;
+    public event EventHandler<JobFailedDto>? JobFailedReceived;
     public event EventHandler<InstanceStatusChangedData>? InstanceStatusChanged;
     public event EventHandler<InstanceLogData>? InstanceLogReceived;
 
@@ -145,10 +147,26 @@ public class WebSocketClient : IWebSocketClient
             switch (eventName)
             {
                 case "job:progress":
-                    var jobProgress = JsonSerializer.Deserialize<JobProgressDto>(message, _jsonOptions);
-                    if (jobProgress != null)
+                    var jobProgress = JsonSerializer.Deserialize<WSJobProgressEvent>(message, _jsonOptions);
+                    if (jobProgress?.Data != null)
                     {
-                        JobProgressReceived?.Invoke(this, jobProgress);
+                        JobProgressReceived?.Invoke(this, jobProgress.Data);
+                    }
+                    break;
+
+                case "job:completed":
+                    var jobCompleted = JsonSerializer.Deserialize<WSJobCompletedEvent>(message, _jsonOptions);
+                    if (jobCompleted?.Data != null)
+                    {
+                        JobCompletedReceived?.Invoke(this, jobCompleted.Data);
+                    }
+                    break;
+
+                case "job:failed":
+                    var jobFailed = JsonSerializer.Deserialize<WSJobFailedEvent>(message, _jsonOptions);
+                    if (jobFailed?.Data != null)
+                    {
+                        JobFailedReceived?.Invoke(this, jobFailed.Data);
                     }
                     break;
 

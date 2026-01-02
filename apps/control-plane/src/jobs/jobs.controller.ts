@@ -1,7 +1,8 @@
 import { Controller, Get, Post, Body, Query, Param, HttpCode, HttpStatus, Logger } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody, ApiParam } from '@nestjs/swagger';
 import { JobsService } from './jobs.service';
-import { JobPollResponseDto, JobProgressDto, JobCompleteDto, JobResponseDto } from '@ark-asa/contracts';
+import { JobPollResponseDto, JobResponseDto } from '@ark-asa/contracts';
+import { JobCreateDtoClass } from './dto/job-create.dto';
 import { JobProgressDtoClass } from './dto/job-progress.dto';
 import { JobCompleteDtoClass } from './dto/job-complete.dto';
 
@@ -11,6 +12,21 @@ export class JobsController {
   private readonly logger = new Logger(JobsController.name);
 
   constructor(private readonly jobsService: JobsService) {}
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new job' })
+  @ApiBody({ type: JobCreateDtoClass })
+  @ApiResponse({
+    status: 201,
+    description: 'Job created successfully',
+    type: Object,
+  })
+  @ApiResponse({ status: 404, description: 'Instance not found' })
+  @ApiResponse({ status: 400, description: 'No available agents' })
+  async createJob(@Body() dto: JobCreateDtoClass): Promise<JobResponseDto> {
+    this.logger.log(`Job creation request: ${dto.jobType}`);
+    return this.jobsService.createJob(dto);
+  }
 
   @Get('poll')
   @ApiOperation({ summary: 'Poll for jobs assigned to an agent' })
